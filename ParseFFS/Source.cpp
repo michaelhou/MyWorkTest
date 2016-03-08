@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	void * ROM_img;
 	UINT8 * ROM_Byte0;
 	UINT64 CurSign;
-	UINT32 CurFFSSize;
+	UINT32 CurFFSSize,FFSSizeLimit=0xffffff;
 	UINT16 TestCKSum,*TempPosStart;
 	UINTN TempCnt,TempEnd;
 	EFI_FIRMWARE_VOLUME_HEADER* pCurFWHDR;
@@ -100,10 +100,10 @@ int main(int argc, char** argv)
 				CurFFSSize=0;
 				memcpy(&CurFFSSize,pCurFFSHDR->Size,sizeof(pCurFFSHDR->Size));
 				CurFFSSize=(CurFFSSize+aligment_FFS)&~aligment_FFS;
-				CurFFSSize&=0xffffff;
+				CurFFSSize&=FFSSizeLimit;
 				printf(" CurFFSSize=%x\n",CurFFSSize);
 				pCurFFSHDR=(EFI_FFS_FILE_HEADER*)((UINT8*)pCurFFSHDR+CurFFSSize);
-			}while(CurFFSSize);
+			}while(CurFFSSize&&(memcmp(pCurFFSHDR->Size,&FFSSizeLimit,3)));
 			CurPos+=16;
 		}
 		else
