@@ -2,6 +2,10 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+/////for use of hton s l ll //not goot to use
+//#include<winsock.h>
+////Winsock2.h
+////<AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
 typedef unsigned char UINT8;
 typedef unsigned short UINT16;
 typedef unsigned int UINT32;
@@ -158,7 +162,8 @@ typedef struct {
 } EFI_FIRMWARE_VOLUME_HEADER;
 
 #pragma pack()
+#define aligment_FFS        7
+#define aligment_section    3
 #define EFI_FIRMWARE_FILE_SYSTEM2_GUID \
   { 0x8c8ce578, 0x8a3d, 0x4f1c, { 0x99, 0x35, 0x89, 0x61, 0x85, 0xc3, 0x2d, 0xd3 } }
-
 #define CR(record,type,field) ((UINT8*)((UINT8*)(record)-(UINT8*)&((type*)0)->field))

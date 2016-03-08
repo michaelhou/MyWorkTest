@@ -1,13 +1,32 @@
 #include"header.h"
-///reference COMMON\EM\CORESRC\CRISIS\InitLib\DXE_BS\CRISIS_Update.c(184) :EFI_STATUS ReloadWinflashSmmDriver
+///reference COMMON\EM\CORESRC\CRISIS\InitLib\DXE_BS\CRISIS_Update.c(184) :EFI_STATUS reloadwinflashsmmdriver
 EFI_GUID SMBIOS_GUID={0XEB9D2D31,0X2D88,0X11D3,0X9A16,0X0090273FC14D};
 EFI_GUID SMBIOS_GUID2={0x51a1c105, 0x7c13, 0x456a, {0xa6, 0xd8, 0xca, 0x8c, 0x27, 0xb4, 0xc0, 0x59}};
+UINT16 mic_htons(UINT16 ii)
+{
+	return (ii<<8)|(ii>>8);
+}
+UINT32 mic_htonl(UINT32 ii)
+{
+	return (mic_htons(ii)<<16)|(mic_htons(ii>>16));
+}
+UINT64 mic_htonll(UINT64 ii)
+{
+	UINT32 tmp32_1,tmp32_2;
+	tmp32_1=(UINT32)ii;
+	tmp32_1=mic_htonl(tmp32_1);
+	memcpy(&tmp32_2,(UINT8*)&ii+4,4);
+	tmp32_2=mic_htonl(tmp32_2);
+	ii=tmp32_2;
+	memcpy((UINT8*)&ii+4,&tmp32_1,4);
+	return ii;
+}
 void printguid(EFI_GUID* cguid)
 {
 	int a=sizeof(UINT64);
 	//LLX will not work.%16llX
 	printf("%08X-%04X-%04X-%llX",
-		(UINTN)cguid->Data1,(UINTN)cguid->Data2,(UINTN)cguid->Data3,*(UINT64*)(cguid->Data4));
+		(UINTN)(cguid->Data1),(UINTN)(cguid->Data2),(UINTN)(cguid->Data3),(mic_htonll(*(UINT64*)cguid->Data4)));
 }
 int main(int argc, char** argv)
 {
@@ -24,6 +43,12 @@ int main(int argc, char** argv)
 	UINT8 achar;
 	EFI_FFS_FILE_HEADER* pCurFFSHDR;
 	EFI_GUID      gEfiFirmwareFileSystemGuid = EFI_FIRMWARE_FILE_SYSTEM2_GUID;
+	UINT16 testvar16_1=0x1234,testvar16_2;
+	UINT32 testvar32_1=0x12345678,testvar32_2;
+	UINT64 testvar64_1=0x1234567890654321,testvar64_2;
+	testvar16_2=mic_htons(testvar16_1);
+	testvar32_2=mic_htonl(testvar32_1);
+	testvar64_2=mic_htonll(testvar64_1);
 	if(!(ROM_img=malloc(BIOS_size)))
 	{
 		printf("not enough mem to allocate!\n");
@@ -69,16 +94,16 @@ int main(int argc, char** argv)
 				continue;
 			}
 			pCurFFSHDR=(EFI_FFS_FILE_HEADER*)((UINT8*)pCurFWHDR+pCurFWHDR->HeaderLength);
-			printf("    :%p guid=",pCurFFSHDR);
-			printguid(&pCurFFSHDR->Name);
-			CurFFSSize=0;
-			memcpy(&CurFFSSize,pCurFFSHDR->Size,sizeof(pCurFFSHDR->Size));
-			printf(" CurFFSSize=%x\n",CurFFSSize);
-			//if(!memcmp(&pCurFFSHDR->Name,))
-			//{}
-			//do{
-			//	
-			//}while(1);
+			do{
+				printf("    :%p guid=",(UINT8*)pCurFFSHDR-ROM_Byte0);
+				printguid(&pCurFFSHDR->Name);
+				CurFFSSize=0;
+				memcpy(&CurFFSSize,pCurFFSHDR->Size,sizeof(pCurFFSHDR->Size));
+				CurFFSSize=(CurFFSSize+aligment_FFS)&~aligment_FFS;
+				CurFFSSize&=0xffffff;
+				printf(" CurFFSSize=%x\n",CurFFSSize);
+				pCurFFSHDR=(EFI_FFS_FILE_HEADER*)((UINT8*)pCurFFSHDR+CurFFSSize);
+			}while(CurFFSSize);
 			CurPos+=16;
 		}
 		else
