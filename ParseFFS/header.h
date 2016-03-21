@@ -161,6 +161,12 @@ typedef struct {
   EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
 } EFI_FIRMWARE_VOLUME_HEADER;
 
+typedef struct _FV_GUID_NAME
+{
+	GUID guid;
+	const char* name;
+}FV_GUID_NAME,*pFV_GUID_NAME;
+
 #pragma pack()
 #define aligment_FFS        7
 #define aligment_section    3

@@ -2,6 +2,9 @@
 ///reference COMMON\EM\CORESRC\CRISIS\InitLib\DXE_BS\CRISIS_Update.c(184) :EFI_STATUS reloadwinflashsmmdriver
 EFI_GUID SMBIOS_GUID={0XEB9D2D31,0X2D88,0X11D3,0X9A16,0X0090273FC14D};
 EFI_GUID SMBIOS_GUID2={0x51a1c105, 0x7c13, 0x456a, {0xa6, 0xd8, 0xca, 0x8c, 0x27, 0xb4, 0xc0, 0x59}};
+FV_GUID_NAME FV_GUID_NAMEs[]={
+	{{0xcef5b9a3,0x476d,0x497f,{0x9f,0xdc,0xe9,0x81,0x43,0xe0,0x42,0x2c}},"NVRAM"},
+};
 UINT16 mic_htons(UINT16 ii)
 {
 	return (ii<<8)|(ii>>8);
@@ -34,6 +37,7 @@ int main(int argc, char** argv)
 	int sz1[]={sizeof(UINT8),sizeof(UINT16),sizeof(UINT32),sizeof(UINT64),sizeof(UINTN)};
 	int BIOS_size=0x800000,Real_size,CurPos;
 	void * ROM_img;
+	char * File_Name_STR;
 	UINT8 * ROM_Byte0;
 	UINT64 CurSign;
 	UINT32 CurFFSSize,FFSSizeLimit=0xffffff;
@@ -49,12 +53,19 @@ int main(int argc, char** argv)
 	testvar16_2=mic_htons(testvar16_1);
 	testvar32_2=mic_htonl(testvar32_1);
 	testvar64_2=mic_htonll(testvar64_1);
+
+	if(argc<2)
+	{
+		return -1;
+	}
+	File_Name_STR=argv[1];
 	if(!(ROM_img=malloc(BIOS_size)))
 	{
 		printf("not enough mem to allocate!\n");
 		return -1;
 	}
-	if((fp=fopen("D:\\Work\\myrelease\\SRC\\X756UQ\\1.5MSku\\X756UQ.T21","rb"))==NULL)
+	//if((fp=fopen("D:\\Work\\myrelease\\SRC\\X756UQ\\1.5MSku\\X756UQ.T21","rb"))==NULL)
+	if((fp=fopen(File_Name_STR,"rb"))==NULL)
 	{
 		printf("file open error!\n");
 		return -2;
