@@ -1,0 +1,8 @@
+board: BBBBB
+project: XXXX
+bundle_name: 20180619_evt
+server_url: http://XX.XX.XX.XX:8080/
+firmware: local
+release_image: local
+test_image: local
+toolkit: local
