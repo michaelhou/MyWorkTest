@@ -7,4 +7,4 @@ echo ../../factory/bin/finalize_bundle .
 cd ..
 
 file ${bundlename}.tar.bz2
-md5sum ${bundlename}.tar.bz2 >> md5.txt
+md5sum ${bundlename}.tar.bz2 >> md5sum.txt
